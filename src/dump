@@ -1,0 +1,50 @@
+
+
+(defun prepare-jump-map (asm)
+  (let ((asm (append (resolve-jumplabels asm)
+		     (asm stop)))
+	(asm-map (make-hash-table)))
+    (let ((offset 0))
+      (dolist (ins asm)
+	(setf (gethash offset asm-map) ins)
+	(setf offset (+ offset (length (to-bytecode ins))))))
+    asm-map))
+
+(defun exec-asm (asm &key (stack '()) (ins-limit 10000))
+  (let ((pc 0)
+	(code-map (prepare-jump-map asm)))
+    (do ((stopped nil)
+	 (ins-count 0 (1+ ins-count)))
+	((or stopped (>= ins-count ins-limit)))
+      (let ((ins (gethash pc code-map)))
+	(unless ins
+	  (error "Cant find valid instruction under given pc value"))
+	(trivia:match ins
+	  ((class stop-evm) (setf stopped t))
+	  ((class add-evm) (push (mod (+ (pop stack) (pop stack)) +max-uint+) stack))
+	  ((class mul-evm) (push (mod (* (pop stack) (pop stack)) +max-uint+) stack))
+	  ((class sub) (push (mod (- (pop stack) (pop stack)) +max-uint+) stack))
+	  ((class push-evm data) (push data stack))
+	  ((class jumpdest-evm) t)
+	  ((class eq-evm) (push (if (= (pop stack) (pop stack))
+				    1
+				    0) stack))
+	  ((class jump-evm) (let ((dest (pop stack)))
+			      (assert (typep (gethash dest code-map) 'jumpdest-evm) ()
+				      "incorrect jumdest value: ~a" dest)
+			      (setf pc dest)))
+	  ((class jumpi-evm) (let ((dest (pop stack))
+				   (bool (/= (pop stack) 0)))
+			       (assert (or (not bool)
+					   (and bool
+						(typep (gethash dest code-map) 'jumpdest-evm)))
+				       ()
+				       "incorrect jumpdest value: ~a" dest)
+			       (setf pc (if bool dest (1+ pc)))))
+	  (_ (error "Instruction is not supported: ~a" ins)))
+
+	(trivia:match ins
+	  ((class jump-evm) t)
+	  ((class jumpi-evm) t)
+	  (_ (progn (setf pc (+ pc (length (to-bytecode ins))))))))))
+  (values stack))
