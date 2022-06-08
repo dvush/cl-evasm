@@ -6,6 +6,9 @@ What it means is that this package provides macro that allows the user to write
 evm assembly code with simple syntax while having full general purpose language (Common Lisp)
 available to augment asm code writing with arbitrary code. 
 
+See "Advanced, meta evaluation" what is possible with this approach that is impossible with other
+assemblies.
+
 The goal of this code is to 
 1. Show how one can possibly implement simple and powerful assembly.
 (it's only ~200 lines of code, where 90 is just instruction enumeration)
@@ -99,7 +102,7 @@ Usage:
 
 I will not implement hide, but this is trivial code transformation left as an exercise to the reader.
 
-Possible implementation - hide will be common lisp macro (or function, but syntax would be `(hide (asm ...))` instead of `(hide ...)`). Hide will take asm instructions and transform them in a way that code inside will never see hidden value (e.g. `(swap n)`, `(dup n)` will be replaced to `(swap (+ n 1))` `(swap (+ n 1))`).
+Possible implementation - hide will be common lisp macro (or function, but syntax would be `(hide (asm ...))` instead of `(hide ...)`). Hide will take asm instructions and transform them in a way that code inside will never see hidden value (e.g. `(swap n)`, `(dup n)` will be replaced with `(swap (+ n 1))` `(swap (+ n 1))`).
 
 
 #### Other uses of meta evaluation 
@@ -108,3 +111,5 @@ Possible implementation - hide will be common lisp macro (or function, but synta
 
 1. `if`,`then`,`else` - can be used instead of arbitrary jumps and labels.
 2. Loops. Loop can be a macro that takes code inside loop (body), adds loop counter logic around and hides loop counter data from body.
+
+See [Factor language](https://factorcode.org) for inspiration of useful stack utilities, especially [combinators](https://docs.factorcode.org/content/article-combinators.html)
