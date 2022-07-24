@@ -19,8 +19,8 @@ The goal of this code is to
 
 Rules for asm writing. 
 
-We use `asm` macro to transform evm assembly DSL to list of assembly mnemonics,
-`emit-bytecode` function is used to transform the output of asm into hex bytecode.
+We use `asm`, `asm-hex`, `asm-oct` macros to transform evm assembly DSL to list of assembly mnemonics,
+`mnemonict->octets` function is used to transform the output of `asm` into hex bytecode.
 
 ## Literals and mnemonics
 
@@ -29,6 +29,7 @@ We use `asm` macro to transform evm assembly DSL to list of assembly mnemonics,
 Numbers and hex strings are translated to push instruction of appropriate size.
 ```lisp
 (asm 16) ;; =>  '((push 1 16))
+(asm-hex 16) ;; =>  "6010"
 (asm "0xaabb") ;; => '((PUSH 2 43707))))'
 ```
 
@@ -46,7 +47,7 @@ For each evm opcode there is a mnemonic defined in `src/assembly.lisp`.
 (asm 2 2 add 4 eq
      (push-label 'ok) jumpi
      0 0 revert
-	 (label 'ok)) ;; adds 2 and 2 and if its not 4 we revert, if its 4 we jump over revert
+     (label 'ok)) ;; adds 2 and 2 and if its not 4 we revert, if its 4 we jump over revert
 ```
 
 ### Arbitrary evaluation
@@ -80,7 +81,7 @@ We can emulate static memory allocation or free storage pointer with this.
        (allocated-memory-slot-1 (incf free-memory-slot 32)) ;; its 0
        (allocated-memory-slot-2 (incf free-memory-slot 32))) ;; its 32
   (asm allocated-memory-slot-1 mload 
-       allocated-memory-slot-1 mload add)) ;; adds memory slots at 0 and 32 to each other
+       allocated-memory-slot-2 mload add)) ;; adds memory slots at 0 and 32 to each other
 ```
 
 

@@ -4,11 +4,14 @@
   (:use #:cl)
   (:export
    ;; main enty points
-   ;; asm - macro to write evmasm programs
-   ;; emit-bytecode - convert asm to hex byte
+   ;; asm, asm-hex, asm-raw - macro to write evmasm programs
    #:asm
+   #:asm-oct
+   #:asm-hex
+
    #:asm-raw
-   #:emit-bytecode
+   #:mnemonics->octets
+   #:mnemonics->hex
 
    ;; assembly mnemonics
    #:stop

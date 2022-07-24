@@ -121,7 +121,7 @@
    '(0 1) :validate (<= 1 n 32))
   ((dup n) (+ #x80 (1- n)) (list n (1+ n)) :validate (<= 1 n 16))
   ((swap n) (+ #x90 (1- n)) (list n n)  :validate (<= 1 n 16))
-  ((log n) (+ #xa0 (1- n)) (list (+ 2 n) 0) :validate (<= 0 n 4))
+  ((log n) (+ #xa0 n) (list (+ 2 n) 0) :validate (<= 0 n 4))
   (create #xf0 '(3 1))
   (call #xf1 '(7 1))
   (callcode #xf2 '(7 1))
@@ -175,6 +175,12 @@
 		       `(list (quote ,(car i)) ,@(cdr i)))
 		      (t `(asm-raw (list ,i))))))))
 
+(defmacro asm-oct (&rest ins)
+  `(mnemonics->octets (asm ,@ins)))
+
+(defmacro asm-hex (&rest ins)
+  `(mnemonics->hex (asm ,@ins)))
+
 (defun instruction-to-bytecode (ins)
   (let ((ins-name (alexandria:ensure-car ins)))
     (multiple-value-bind (to-bytecode-fun found) (gethash ins-name *mnemonics-to-bytecode*)
@@ -203,10 +209,12 @@
 		    ((list 'label _) 'jumpdest)
 		    (other other)))))
 
-(defun emit-bytecode (asm)
+(defun mnemonics->octets (asm)
   (let ((asm (resolve-jumplabels asm)))
-    (bitsmash:hex<-
-     (apply #'concatenate '(vector (unsigned-byte 8))
-	    (loop for ins in asm
-		  collect (instruction-to-bytecode ins))))))
+    (apply #'concatenate '(vector (unsigned-byte 8))
+	   (loop for ins in asm
+		 collect (instruction-to-bytecode ins)))))
 
+
+(defun mnemonics->hex (asm)
+  (bitsmash:hex<- (mnemonics->octets asm)))
