@@ -10,4 +10,5 @@
   :components ((:module "src"
 		:components ((:file "package")
 			     (:file "assembly")
-			     (:file "evasm")))))
+			     (:module "examples"
+				      :components ((:file "spray")))))))

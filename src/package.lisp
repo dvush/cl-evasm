@@ -91,6 +91,10 @@
    #:staticcall
    #:revert
    #:invalid
+   #:verbatim
    #:push-label
    #:label
    #:selfdestuct))
+
+(uiop:define-package #:evasm-examples
+  (:use #:cl #:evasm))

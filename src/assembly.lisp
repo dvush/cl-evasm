@@ -130,7 +130,8 @@
   (create2 #xf5 '(4 1))
   (staticcall #xfa '(6 1))
   (revert #xfd '(2 0))
-  ((invalid data) (bitsmash:octets<- data) '(0 0))
+  ((verbatim data) (bitsmash:octets<- data) '(0 0))
+  (invalid #xfe '(0 0))
   ((push-label sym) (error "labels should be resolved") '(0 1))
   ((label sym) (error "labels should be resolved") '(0 0))
   (selfdestuct #xff '(1 0)))
@@ -193,7 +194,7 @@
       (dolist (ins asm)
 	(when (eql (alexandria:ensure-car ins) 'label)
 	  (assert (null (gethash (second ins) label-positions)) ()
-		  "Jump label ~a occurs multiple times: ~a" (second ins))
+		  "Jump label occurs multiple times: ~a" (second ins))
 	  (setf (gethash (second ins) label-positions) offset))
 	(let ((ins-length (trivia:match ins
 			    ((list 'push-label _) (1+ *jump-dest-size-bytes*))

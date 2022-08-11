@@ -38,7 +38,7 @@ For each evm opcode there is a mnemonic defined in `src/assembly.lisp`.
 - Most mnemonics are just symbols from evm spec.: `add` `pop` 
 - Some mnemonics are lists of repetitive symbols from spec. `(push 1 #xff)` `(dup 11)` `(swap 5)` `(log 1)`
 - There are special mnemonics 
-  1. `(invalid #xaabbccff)` - sequence of bytes that represent a sequence of arbitrary invalid instructions
+  1. `(verbatim #xaabbccff)` - sequence of bytes that represent a sequence of arbitrary instructions
   2. `(push-label 'symbol')`, `(label 'symbol)` - symbolic labels of some place in bytecode. `label` will resolve
       to `jumpdest` and `push-label` will resolve to `push` of label position to stack.
 
